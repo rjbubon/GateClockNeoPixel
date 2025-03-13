@@ -738,13 +738,13 @@ void checkChime()
   int sequence = random(1,8);
   switch(sequence)
     {
-      case 1: dialGate(); dialFailSparks(); break;
-      case 2: dialGate(); kawoosh(); wormholeisopen(); wormholeEnd(); break;
-      case 3: dialGate(); kawoosh(); wormholeisopen(); wormholeUnstable(); break;
-      case 4: dialIn(); kawoosh(); wormholeisopen(); wormholeEnd(); break;
-      case 5: dialIn(); kawoosh(); wormholeisopen(); wormholeUnstable(); break;
-      case 6: dialGate(); kawoosh(); wormholeisopen(); wormholeEnd(); break;
-      case 7: dialGate(); dialFail(); break;  
-      default: dialGate(); kawoosh(); wormholeisopen(); wormholeEnd(); break;
+      case 1: Output("Dial Out Sparksl"); dialGate(); dialFailSparks(); break;
+      case 2: Output("Dial Out Okay"); dialGate(); kawoosh(); wormholeisopen(); wormholeEnd(); break;
+      case 3: Output("Dial Out Unstable"); dialGate(); kawoosh(); wormholeisopen(); wormholeUnstable(); break;
+      case 4: Output("Inbound Okay"); dialIn(); kawoosh(); wormholeisopen(); wormholeEnd(); break;
+      case 5: Output("Inbound Unstable"); dialIn(); kawoosh(); wormholeisopen(); wormholeUnstable(); break;
+      case 6: Output("Dial Out Okay"); dialGate(); kawoosh(); wormholeisopen(); wormholeEnd(); break;
+      case 7: Output("Dial Out Fail"); dialGate(); dialFail(); break;  
+      default: Output("Dial Out Okay"); dialGate(); kawoosh(); wormholeisopen(); wormholeEnd(); break;
   }
 }

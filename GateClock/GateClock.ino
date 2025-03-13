@@ -6,8 +6,9 @@
  *   Description: Run a analog clock on a ring of 60 leds. On the quarter hour run Stargate effects.
  *   Author: Robert Bubon
  *   Date:   2025-03-09 RJB Based on code running backyard GE Color Effects Xmas light Gate Clock
- *           2025-03-XX RJB
+ *           2025-03-13 RJB Added time and date to oled
  *   
+ *   Inspiration https://hackaday.io/project/1919-stargate-led-clock https://github.com/hopo28/SG1_CLOCK
  *======================================================================================================================
  */
 
