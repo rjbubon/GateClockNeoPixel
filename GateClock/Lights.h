@@ -370,9 +370,9 @@ void dialGate()
   
   // Call the function to fill the array
   SetGateAddress();
-  sprintf (msgbuf, "GateAddress:");
+  sprintf (msgbuf, "GateAdr:");
   for (int i = 0; i <= 9; i++) {
-    sprintf (msgbuf+strlen(msgbuf), " %d", GateAddress[i]);
+    sprintf (msgbuf+strlen(msgbuf), "%d", GateAddress[i]);
   }
   Output (msgbuf);
 

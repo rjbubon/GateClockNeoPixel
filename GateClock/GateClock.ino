@@ -1,7 +1,8 @@
 /*
  *======================================================================================================================
  * GateClock - NeoPixel Based
- *   Board Type : Adafruit Feather M0 (WiFi Boards)
+ *   Board Type : Adafruit Feather M0 (WiFi Board) https://www.adafruit.com/product/3010
+ *   Addon Board: Adalogger FeatherWing - RTC + SD https://www.adafruit.com/product/2922
  *   Description: Run a analog clock on a ring of 60 leds. On the quarter hour run Stargate effects.
  *   Author: Robert Bubon
  *   Date:   2025-03-09 RJB Based on code running backyard GE Color Effects Xmas light Gate Clock
@@ -214,7 +215,7 @@ void loop()
     if (!digitalRead(ButtonUpPin) && !digitalRead(ButtonDownPin)) {
       ledBrightness = 0;
       pixels.setBrightness(ledBrightness);
-      sprintf (msgbuf, "Led Brightness Off [%d]", ledBrightness);
+      sprintf (msgbuf, "Led Off [%d]", ledBrightness);
       Output (msgbuf);
     }
     else if (!digitalRead(ButtonUpPin)) {
@@ -232,7 +233,7 @@ void loop()
           ledBrightness = 200;
         }
         pixels.setBrightness(ledBrightness);
-        sprintf (msgbuf, "Led Brightness Up [%d]", ledBrightness);
+        sprintf (msgbuf, "Led Up [%d]", ledBrightness);
         Output (msgbuf);
         lastUp = millis();
       }
@@ -253,7 +254,7 @@ void loop()
           ledBrightness = 1;
         }
         pixels.setBrightness(ledBrightness);
-        sprintf (msgbuf, "Led Brightness Down [%d]", ledBrightness);
+        sprintf (msgbuf, "Led Down [%d]", ledBrightness);
         Output (msgbuf);
         lastDown = millis();
       }
@@ -276,16 +277,56 @@ void loop()
     }
 
     // Only update the clock time when the second has changed.
-    if (lastsecond != s) {
+    if (lastsecond != s) {    
+      int mth,mday,yr;
+      
       lastsecond=s; 
       displayClock(h, m, s);
-    }
-        
-    // Output to Serial the time
-    if (lastminute != m) {
+      
+      mth = now.month();
+      mday = now.day();
+      yr = now.year();
       sprintf (msgbuf, "%02d:%02d:%02d", h,m,s);
-      Output (msgbuf);
-      lastminute=m;
+      
+      if (DisplayEnabled) {
+        if (OLED32) {      
+          display32.clearDisplay();
+          display32.setTextSize(2); // Draw 2X-scale text
+          
+          display32.setCursor(0, 0);
+          display32.print(msgbuf);
+
+          sprintf (msgbuf, "%02d/%02d/%04d", mth,mday,yr);
+
+          display32.setCursor(0, 17);
+          display32.print(msgbuf);
+          
+          display32.display();
+          
+          display32.setTextSize(1); // Draw 2X-scale text
+          display32.display();
+        }
+        else {
+          display64.clearDisplay();
+          display64.setTextSize(2); // Draw 2X-scale text
+          
+          display64.setCursor(0, 0);
+          display64.print(msgbuf);
+
+          sprintf (msgbuf, "%02d/%02d/%04d", mth,mday,yr);
+
+          display64.setCursor(0, 17);
+          display64.print(msgbuf);
+          
+          display64.display();
+          
+          display64.setTextSize(1); // Draw 2X-scale text
+          display64.display();          
+        }
+      }
+      else {
+        Output (msgbuf);
+      }
     }
  
     // Get Network time and update the RTC @ 2:05:00 each day
