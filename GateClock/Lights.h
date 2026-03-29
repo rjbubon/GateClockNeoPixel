@@ -38,6 +38,11 @@ void clearLeds() {
 void updateLeds() {
   int i;
   int p;
+
+  // Added 2 lines for outside neopixel gate clock
+  pixels.clear();
+  pixels.show();
+
   for (i=0; i<lightCount; i++) {
     // make 0 be the bottom of the circle aka 30
     p=(i+30) % 60; 

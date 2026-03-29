@@ -213,4 +213,7 @@ void SD_ReadConfigFile() {
   cf_ntpserver      = SD_findCharStr(F("ntpserver"));
   sprintf(msgbuf, "CF:%s=[%s]", F("ntpserver"), cf_ntpserver); Output (msgbuf);
 
+  //UTC Offset for Standart Time
+  cf_utc_offset      = SD_findInt(F("utc_offset"));
+  sprintf(msgbuf, "CF:%s=[%d]", F("utc_offset"), cf_utc_offset); Output (msgbuf);
 }

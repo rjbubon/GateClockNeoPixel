@@ -9,6 +9,9 @@
  *           2025-03-13 RJB Added time and date to oled
  *   
  *   Inspiration https://hackaday.io/project/1919-stargate-led-clock https://github.com/hopo28/SG1_CLOCK
+ *   
+ *   Outside GateClock - 50nodes addressable RGB C9 DC12V WS2811 LED Christmas pixel string
+ *   https://gilbertengineeringusa.com/products/c9-pixabulbs-50-node?_pos=1&_sid=c98c55ee9&_ss=r
  *======================================================================================================================
  */
 
@@ -84,13 +87,14 @@ char Buffer32Bytes[32];         // General storage
 #define DST_PIN           11  // Ground Pin for Daylight Saving tine -7
 #define LED_PIN           LED_BUILTIN
 
-#define TM_VALID_YEAR_START     2025
+#define TM_VALID_YEAR_START     2026
 #define TM_VALID_YEAR_END       2033
 
 #define NEOPIX_PIN A2    // Arduino pin to Ge Color Effects Lights
 #define lightCount 60    //Total # of lights on string (usually 50, 48, or 36)
 #define WH_MIN 2         //wormhole min and max run times (Seconds)
 #define WH_MAX 5
+#define DEFAULT_BRIGHTNESS 150
 
 // Rotary Encoder Pins
 #define ButtonUpPin 6
@@ -98,7 +102,7 @@ char Buffer32Bytes[32];         // General storage
 unsigned long lastUp=0;
 unsigned long lastDown=0;
 
-volatile int ledBrightness = 5; // Start in the middle of the range
+volatile int ledBrightness = 4; // Start in the middle of the range
 volatile bool encoderChanged = false;
 
 Adafruit_NeoPixel pixels(lightCount, NEOPIX_PIN, NEO_GRB + NEO_KHZ800);
@@ -173,6 +177,8 @@ void loop()
   int h, m, s;
   static int lastminute=0;
   static int lastsecond=0;
+  static int p = 0;
+  int l = 59;
 
   if (!RTC_valid) {  // Must get time from human
     static bool first = true;
@@ -230,8 +236,8 @@ void loop()
         else if (ledBrightness >= 20) {
           ledBrightness += 5;
         }
-        if (ledBrightness > 200) {
-          ledBrightness = 200;
+        if (ledBrightness > DEFAULT_BRIGHTNESS) {
+          ledBrightness = DEFAULT_BRIGHTNESS;
         }
         pixels.setBrightness(ledBrightness);
         sprintf (msgbuf, "Led Up [%d]", ledBrightness);
@@ -267,11 +273,21 @@ void loop()
     m = now.minute();
     s = now.second();
 
+    // Set intensity based on hour
+    if (h==6 && m==0 && s==0) {
+      FastLED.setBrightness(DEFAULT_BRIGHTNESS);
+      ledBrightness = DEFAULT_BRIGHTNESS;
+    }
+    else if (h==22 && m==0 && s==0) {
+      FastLED.setBrightness(10);
+      ledBrightness = 10;
+    }
+
     // Get Network time and update the RTC @ 2:05:00 each day
     if (WiFi_valid && (h==2) && (m==5) && (s==0)) {
       WiFi_UpdateTime();
     }
-    
+
     // Do chime before updating the clock
     if (((m%15) == 0) && s == 0) {  // On the hour and half hour
       checkChime();
@@ -287,18 +303,21 @@ void loop()
       mth = now.month();
       mday = now.day();
       yr = now.year();
-      sprintf (msgbuf, "%02d:%02d:%02d", h,m,s);
-      
+         
       if (DisplayEnabled) {
+        int hh=h%12;
+        if (h==0) {
+          hh=12;
+        }
         if (OLED32) {      
           display32.clearDisplay();
           display32.setTextSize(2); // Draw 2X-scale text
-          
+
+          sprintf (msgbuf, "%04d/%02d/%02d", yr, mth, mday);
           display32.setCursor(0, 0);
           display32.print(msgbuf);
 
-          sprintf (msgbuf, "%02d/%02d/%04d", mth,mday,yr);
-
+          sprintf (msgbuf, "%d:%02d:%02d%s", hh,m,s, (h<12)?"AM":"PM");
           display32.setCursor(0, 17);
           display32.print(msgbuf);
           
@@ -310,12 +329,12 @@ void loop()
         else {
           display64.clearDisplay();
           display64.setTextSize(2); // Draw 2X-scale text
-          
+
+          sprintf (msgbuf, "%04d/%02d/%02d", yr, mth,mday);
           display64.setCursor(0, 0);
           display64.print(msgbuf);
 
-          sprintf (msgbuf, "%02d/%02d/%04d", mth,mday,yr);
-
+          sprintf (msgbuf, "%d:%02d:%02d%s", hh,m,s, (h<12)?"AM":"PM");
           display64.setCursor(0, 17);
           display64.print(msgbuf);
           
@@ -326,6 +345,7 @@ void loop()
         }
       }
       else {
+        sprintf (msgbuf, "%02d:%02d:%02d", h%12,m,s);
         Output (msgbuf);
       }
     }
